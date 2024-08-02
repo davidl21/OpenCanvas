@@ -1,9 +1,10 @@
 import React from "react";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   return (
-    <div>
-      <h1 className="text-3xl underline font-medium">Hello, It's Me</h1>
+    <div className="py-72 flex flex-col items-center text-center">
+      <Navbar />
     </div>
   );
 };
