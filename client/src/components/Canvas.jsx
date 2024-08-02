@@ -7,7 +7,26 @@ const Canvas = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-    // You can add your canvas drawing code here
+
+    const draw = (x, y) => {
+      context.fillStyle = "black";
+
+      // adjust rectangle fill size
+      context.fillRect(x, y, 5, 5);
+    };
+
+    const handleMouseDown = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      draw(x, y);
+    };
+
+    canvas.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      canvas.removeEventListener("mousedown", handleMouseDown);
+    };
   }, []);
 
   return (
