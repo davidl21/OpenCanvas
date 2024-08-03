@@ -35,7 +35,7 @@ const Canvas = () => {
         ref={canvasRef}
         width={1000}
         height={1000}
-        className="border border-orange-300 rounded-md"
+        className="border border-orange-300 rounded-3xl"
       />
     </div>
   );
