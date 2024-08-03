@@ -6,7 +6,7 @@ const Canvas = () => {
   const canvasRef = useRef(null);
   // default black
   const [color, setColor] = useState({ r: 0, g: 0, b: 0 });
-  const gridSize = 1000;
+  const gridSize = 500;
   const pixelSize = 5;
 
   useEffect(() => {
