@@ -21,8 +21,10 @@ const ColorPicker = ({ onColorChange }) => {
   //   };
 
   return (
-    <div className="mt-4 flex space-4">
-      <HuePicker color={color} onChangeComplete={handleChangeComplete} />
+    <div className="mt-10 flex justify-center bg-slate-300 bg-opacity-30 backdrop-blur-lg border-b rounded-full">
+      <div className="p-5">
+        <HuePicker color={color} onChangeComplete={handleChangeComplete} />
+      </div>
     </div>
   );
 };

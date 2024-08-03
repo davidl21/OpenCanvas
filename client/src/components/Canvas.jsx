@@ -33,7 +33,7 @@ const Canvas = () => {
   }, [color]);
 
   return (
-    <div className="mt-10 flex justify-center items-center">
+    <div className="mt-10 flex flex-col justify-center items-center">
       <canvas
         ref={canvasRef}
         width={1000}
