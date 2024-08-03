@@ -15,7 +15,13 @@ const Navbar = () => {
               key="3"
               className="hover:text-orange-600 transition-color duration-300 text-orange-400 text-xl"
             >
-              <a href="/connect">connect w/ me</a>
+              <a
+                href="https://www.linkedin.com/in/davidl21"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                connect w/ me
+              </a>
             </li>
           </ul>
         </div>

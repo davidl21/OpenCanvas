@@ -4,7 +4,7 @@ import Canvas from "./components/Canvas";
 
 const App = () => {
   return (
-    <div className="py-48 flex flex-col items-center text-center">
+    <div className="py-24 flex flex-col items-center text-center">
       <Navbar />
       <Canvas />
     </div>
