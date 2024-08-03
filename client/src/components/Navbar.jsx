@@ -7,22 +7,10 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
             <span className="p-2 text-4xl tracking-tight text-orange-400">
-              OpenCanvas
+              <a href="/">OpenCanvas</a>
             </span>
           </div>
           <ul className="p-2 flex space-x-12">
-            <li
-              key="1"
-              className="hover:text-orange-600 transition-color duration-300 text-orange-400 text-xl"
-            >
-              <a href="/about">about</a>
-            </li>
-            <li
-              key="2"
-              className="hover:text-orange-600 transition-color duration-300 text-orange-400 text-xl"
-            >
-              <a href="/how">how it's built</a>
-            </li>
             <li
               key="3"
               className="hover:text-orange-600 transition-color duration-300 text-orange-400 text-xl"
