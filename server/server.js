@@ -137,6 +137,45 @@ app.post("/api/initialize", async (req, res) => {
   }
 });
 
+app.get("/api/canvas-state", async (req, res) => {
+  try {
+    const getKeys = () => {
+      return new Promise((resolve, reject) => {
+        redisClient.keys("*", (err, keys) => {
+          if (err) return reject(err);
+          resolve(keys);
+        });
+      });
+    };
+
+    const getvalue = (key) => {
+      return new Promise((resolve, reject) => {
+        redisClient.get(key, (err, value) => {
+          if (err) return reject(err);
+          resolve(value);
+        });
+      });
+    };
+
+    const keys = await getKeys();
+
+    const canvasStatePromises = keys.map(async (key) => {
+      const value = await getValue(key);
+      const [x, y] = key.split(":").map(Number);
+      const color = JSON.parse(value);
+      return { x, y, color };
+    });
+
+    const canvasState = await Promise.all(canvasStatePromises);
+
+    res.status(200).send(canvasState);
+  } catch (error) {
+    res.status(500).send({
+      message: "Error fetching canvas state.",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server listening on port 3000.");
 });
