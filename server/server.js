@@ -142,4 +142,6 @@ app.listen(3000, () => {
 });
 
 const port = 4000;
-server.listen(port, () => console.log(`HTTP Server listening on port ${port}`));
+server.listen(port, () =>
+  console.log(`HTTP WebSocket Server listening on port ${port}`)
+);

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import io from "socket.io-client";
 import ColorPicker from "./ColorPicker";
 
 const Canvas = () => {
@@ -9,6 +10,19 @@ const Canvas = () => {
   const gridSize = 500;
   const pixelSize = 5;
 
+  const [socket, setSocket] = useState(null);
+
+  // initializing websocket connection and handling websocket connection
+  useEffect(() => {
+    const socketConnection = io("http://localhost:4000");
+    setSocket(socketConnection);
+
+    return () => {
+      socketConnection.disconnect();
+    };
+  }, []);
+
+  // handling drawing logic
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -35,6 +49,11 @@ const Canvas = () => {
         Math.floor((y % gridSize) / pixelSize) * pixelSize + gridY;
       console.log(gridX, gridY);
       draw(snappedX, snappedY);
+
+      // emit draw event to backend
+      if (socket) {
+        socket.emit("draw", { x: snappedX, y: snappedY, color });
+      }
     };
 
     canvas.addEventListener("mousedown", handleMouseDown);
@@ -42,7 +61,7 @@ const Canvas = () => {
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
     };
-  }, [color]);
+  }, [color, socket]);
 
   return (
     <div className="mt-10 flex flex-col justify-center items-center">
