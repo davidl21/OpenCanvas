@@ -42,15 +42,15 @@ redisClient.on("error", (err) => {
   console.error("Redis error", err);
 });
 
-// const loadInitialState = async () => {
-//   const pixels = await Pixel.find({});
-//   pixels.forEach((pixel) => {
-//     const key = `${pixel.x}:${pixel.y}`;
-//     const value = JSON.stringify(pixel.color);
-//     redisClient.set(key, value);
-//   });
-// };
-// loadInitialState();
+const loadInitialState = async () => {
+  const pixels = await Pixel.find({});
+  pixels.forEach((pixel) => {
+    const key = `${pixel.x}:${pixel.y}`;
+    const value = JSON.stringify(pixel.color);
+    redisClient.set(key, value);
+  });
+};
+loadInitialState();
 
 io.on("connection", (socket) => {
   console.log("New client connected.");
