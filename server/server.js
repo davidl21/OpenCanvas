@@ -34,9 +34,15 @@ startServer();
 // new redis instance
 const redisClient = redis.createClient();
 
-redisClient.on("ready", () => {
-  console.log("Connected to Redis.");
-});
+redisClient
+  .connect()
+  .then(async () => {
+    console.log("Connected to Redis.");
+    await loadInitialState();
+  })
+  .catch((err) => {
+    console.error("Redis connection failed:", err);
+  });
 
 redisClient.on("error", (err) => {
   console.error("Redis error", err);
@@ -50,7 +56,6 @@ const loadInitialState = async () => {
     redisClient.set(key, value);
   });
 };
-loadInitialState();
 
 io.on("connection", (socket) => {
   console.log("New client connected.");
@@ -88,7 +93,6 @@ io.on("connection", (socket) => {
 // board setup and clearing in mongodb
 const initializeBoard = async () => {
   try {
-    await mongoose.connect(uri, clientOptions);
     const pixels = [];
     const pixelSize = 5;
     const gridSize = 500 / pixelSize;
@@ -112,8 +116,6 @@ const initializeBoard = async () => {
     console.log("Board initialized with white canvas.");
   } catch (error) {
     console.error("Error initializing board:", error);
-  } finally {
-    await mongoose.connect(uri, clientOptions);
   }
 };
 
@@ -148,7 +150,7 @@ app.get("/api/canvas-state", async (req, res) => {
       });
     };
 
-    const getvalue = (key) => {
+    const getValue = (key) => {
       return new Promise((resolve, reject) => {
         redisClient.get(key, (err, value) => {
           if (err) return reject(err);

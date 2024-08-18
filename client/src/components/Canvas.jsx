@@ -12,20 +12,30 @@ const Canvas = () => {
 
   const [socket, setSocket] = useState(null);
 
-  // initializing websocket connection and handling websocket connection
-  useEffect(() => {
-    const socketConnection = io("http://localhost:4000");
-    setSocket(socketConnection);
-
-    return () => {
-      socketConnection.disconnect();
-    };
-  }, []);
-
   // handling drawing logic
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
+
+    // initialize websocket connection
+    const socketConnection = io("http://localhost:4000");
+    setSocket(socketConnection);
+
+    // fetch current board state
+    const fetchCanvasState = async () => {
+      try {
+        const response = await axios.get("/api/canvas-state");
+        const canvasState = response.data;
+
+        canvasState.forEach(({ x, y, color }) => {
+          context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+          context.fillRect(x, y, pixelSize, pixelSize);
+        });
+      } catch (error) {
+        console.error("Error fetching canvas state", error);
+      }
+    };
+    fetchCanvasState();
 
     const draw = (x, y) => {
       console.log(color);
@@ -38,7 +48,7 @@ const Canvas = () => {
       const rect = canvas.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      console.log(x, y);
+      // console.log(x, y);
       const gridX = Math.floor(x / gridSize) * gridSize;
       const gridY = Math.floor(y / gridSize) * gridSize;
 
@@ -60,6 +70,7 @@ const Canvas = () => {
 
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown);
+      socketConnection.disconnect();
     };
   }, [color, socket]);
 
