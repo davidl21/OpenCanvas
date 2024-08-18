@@ -5,7 +5,7 @@ const redis = require("redis");
 const Pixel = require("./models/Pixel");
 const http = require("http");
 
-const REDIS_PORT = 6379;
+// const REDIS_PORT = 6379;
 
 const app = express();
 const server = http.createServer(app);
@@ -19,22 +19,24 @@ const clientOptions = {
   serverApi: { version: "1", strict: true, deprecationErrors: true },
 };
 
-async function run() {
+async function startServer() {
   try {
-    // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
     await mongoose.connect(uri, clientOptions);
-    await mongoose.connection.db.admin().command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await mongoose.disconnect();
+    console.log("Connected to MongoDB");
+    // Start the server and perform any initial setup
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
   }
 }
-run().catch(console.dir);
 
-const redisClient = redis.createClient(REDIS_PORT);
+startServer();
+
+// new redis instance
+const redisClient = redis.createClient();
+
+redisClient.on("ready", () => {
+  console.log("Connected to Redis.");
+});
 
 redisClient.on("error", (err) => {
   console.error("Redis error", err);
@@ -73,7 +75,7 @@ io.on("connection", (socket) => {
     redisClient.set(key, value);
 
     const pixel = new Pixel({ x, y, color });
-    await Pixel.fineOneAndUpdate({ x, y }, pixel, { upsert: true });
+    await Pixel.findOneAndUpdate({ x, y }, pixel, { upsert: true });
 
     socket.broadcast.emit("draw", { x, y, color });
   });
@@ -83,24 +85,36 @@ io.on("connection", (socket) => {
   });
 });
 
+// board setup and clearing in mongodb
 const initializeBoard = async () => {
-  const pixels = [];
-  const pixelSize = 5;
-  const gridSize = 500 / pixelSize;
+  try {
+    await mongoose.connect(uri, clientOptions);
+    const pixels = [];
+    const pixelSize = 5;
+    const gridSize = 500 / pixelSize;
 
-  for (let x = 0; x < gridSize; x++) {
-    for (let y = 0; y < gridSize; y++) {
-      pixels.push({
-        x: x * pixelSize,
-        y: y * pixelSize,
-        color: { r: 255, g: 255, b: 255, a: 1 },
-      });
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
+        pixels.push({
+          x: x * pixelSize,
+          y: y * pixelSize,
+          color: { r: 255, g: 255, b: 255, a: 1 },
+        });
+      }
     }
+
+    // Clear previous board
+    await Pixel.deleteMany({});
+    console.log("Previous board cleared.");
+
+    // Insert new board
+    await Pixel.insertMany(pixels);
+    console.log("Board initialized with white canvas.");
+  } catch (error) {
+    console.error("Error initializing board:", error);
+  } finally {
+    await mongoose.connect(uri, clientOptions);
   }
-  // clear previous board
-  await Pixel.deleteMany({});
-  await Pixel.insertMany(pixels);
-  console.log("Board initialized with white canvas.");
 };
 
 app.get("/", (req, res) => {
@@ -128,4 +142,4 @@ app.listen(3000, () => {
 });
 
 const port = 4000;
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(port, () => console.log(`HTTP Server listening on port ${port}`));
